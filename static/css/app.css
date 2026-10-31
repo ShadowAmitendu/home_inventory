@@ -1,33 +1,165 @@
 /* ==========================================================================
-   Home Inventory - your UI overrides. Loaded AFTER Bootstrap, so anything here
-   wins. Change colours/fonts/spacing freely; Bootstrap 5.3 reads CSS variables.
-
-   Examples (uncomment):
-   :root { --bs-primary: #0d9488; --bs-primary-rgb: 13,148,136; --bs-border-radius: .75rem; }
-   .navbar-brand { letter-spacing: .02em; }
+   Home Inventory - Modern Bootstrap 5.3 Customizations
    ========================================================================== */
 
-body { background: var(--bs-tertiary-bg); }
-.bootstrap-table .fixed-table-container { border-radius: .375rem; }
-.bootstrap-table .table > :not(caption) > * > * { vertical-align: middle; }
-.fixed-table-toolbar { margin-bottom: .5rem; }
-#tbl tbody tr { cursor: pointer; }
 :root {
   --bs-body-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --bs-font-monospace: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --bs-border-radius: 0.5rem;
+  --bs-border-radius-lg: 0.75rem;
+  --bs-border-radius-xl: 1rem;
 }
-/* every number uses JetBrains Mono */
+
+body {
+  background-color: var(--bs-tertiary-bg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Monospace numbers across the entire UI */
 .num, .page-link, .fixed-table-pagination .page-list .btn {
   font-family: var(--bs-font-monospace);
   font-variant-numeric: tabular-nums;
 }
-.exp-card, .attn { cursor: pointer; }
-.attn:hover { background: var(--bs-tertiary-bg); }
+
+/* Navbar Brand & Elevation */
+.navbar {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background-color: rgba(var(--bs-body-bg-rgb), 0.9) !important;
+  transition: box-shadow 0.2s ease;
+}
+.brand-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+}
+.tracking-tight {
+  letter-spacing: -0.02em;
+}
+
+/* Metric / Dashboard Cards */
+.stat-card {
+  border-radius: var(--bs-border-radius-lg);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  background-color: var(--bs-body-bg);
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08) !important;
+}
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.stat-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+.exp-card {
+  cursor: pointer;
+}
+.exp-card:hover .badge {
+  background-color: var(--bs-primary-subtle) !important;
+  color: var(--bs-primary) !important;
+}
+
+/* Attention Cards */
+.attn {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.attn:hover {
+  transform: translateX(3px);
+  border-color: var(--bs-warning) !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Bootstrap Table Modern Styling */
+.bootstrap-table .fixed-table-container {
+  border-radius: var(--bs-border-radius);
+  border: 1px solid var(--bs-border-color-translucent);
+}
+.bootstrap-table .table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.bootstrap-table .table thead th {
+  background-color: var(--bs-tertiary-bg);
+  color: var(--bs-secondary-color);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--bs-border-color-translucent);
+}
+.bootstrap-table .table tbody td {
+  padding: 0.75rem 0.85rem;
+}
+#tbl tbody tr {
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+#tbl tbody tr:hover td {
+  background-color: var(--bs-primary-bg-subtle) !important;
+}
+
+/* Bootstrap Table Toolbar & Search */
+.bootstrap-table .fixed-table-toolbar {
+  margin-bottom: 0.75rem;
+}
+.bootstrap-table .search input {
+  border-radius: var(--bs-border-radius);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Pagination: Direct page typing & navigation */
+.fixed-table-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+}
+.fixed-table-pagination > .pagination {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+}
+.page-jump-container {
+  font-size: 0.875rem;
+}
+.page-jump-container .page-jump-input {
+  width: 58px;
+  height: 31px;
+  padding: 0 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.page-jump-container .page-jump-btn {
+  height: 31px;
+  padding: 0 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1;
+}
 
 /* Custom Alert Banners */
 #alertContainer {
   position: relative;
-  margin-bottom: 1.25rem;
 }
 .alert-custom {
   position: relative;
@@ -95,34 +227,29 @@ body { background: var(--bs-tertiary-bg); }
   color: #6ea8fe;
 }
 
-/* Pagination: Direct page jump input controls */
-.fixed-table-pagination {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+/* Modals */
+.modal-content {
+  border-radius: var(--bs-border-radius-xl);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
 }
-.fixed-table-pagination > .pagination {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0;
+.modal-header {
+  border-bottom: 1px solid var(--bs-border-color-translucent);
 }
-.page-jump-container {
-  font-size: 0.875rem;
+.modal-footer {
+  border-top: 1px solid var(--bs-border-color-translucent);
 }
-.page-jump-container .page-jump-input {
-  width: 58px;
-  height: 31px;
-  padding: 0 0.35rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+
+/* Thumbnail Gallery */
+.dthumb {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.page-jump-container .page-jump-btn {
-  height: 31px;
-  padding: 0 0.5rem;
-  font-size: 0.8rem;
-  line-height: 1;
+.dthumb:hover {
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Utilities */
+.shadow-xs {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }

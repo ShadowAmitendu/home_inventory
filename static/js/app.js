@@ -10,16 +10,31 @@ const numfy = s => esc(s).replace(/(&#?\w+;)|(\d+)/g,
 function expBadge(r) {
   if (!r.expiry_date) return '';
   if (r.expiry_status === 'expired')
-    return '<span class="badge text-bg-danger num">Expired ' + Math.abs(r.days_left) + 'd ago</span>';
-  if (r.days_left === 0) return '<span class="badge text-bg-warning num">Expires today</span>';
+    return '<span class="badge bg-danger-subtle text-danger-emphasis rounded-pill num"><i class="bi bi-exclamation-triangle-fill me-1"></i>Expired ' + Math.abs(r.days_left) + 'd ago</span>';
+  if (r.days_left === 0)
+    return '<span class="badge bg-warning-subtle text-warning-emphasis rounded-pill num"><i class="bi bi-clock-history me-1"></i>Expires today</span>';
   if (r.expiry_status === 'soon')
-    return '<span class="badge text-bg-warning num">' + r.days_left + 'd left</span>';
-  return '<span class="badge bg-success-subtle text-success-emphasis num">' + r.days_left + 'd left</span>';
+    return '<span class="badge bg-warning-subtle text-warning-emphasis rounded-pill num"><i class="bi bi-hourglass-split me-1"></i>' + r.days_left + 'd left</span>';
+  return '<span class="badge bg-success-subtle text-success-emphasis rounded-pill num"><i class="bi bi-calendar-check me-1"></i>' + r.days_left + 'd left</span>';
 }
 
 const expFmt = (v, r) => v
-  ? '<div class="num">' + esc(v) + '</div><div>' + expBadge(r) + '</div>'
-  : '<span class="text-body-secondary">—</span>';
+  ? '<div><div class="num small fw-semibold text-body">' + esc(v) + '</div><div class="mt-0.5">' + expBadge(r) + '</div></div>'
+  : '<span class="text-body-tertiary">—</span>';
+
+// Theme Switcher
+function updateThemeIcon(theme) {
+  $('#themeIcon').attr('class', theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill');
+}
+const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+updateThemeIcon(currentTheme);
+
+$('#themeToggle').on('click', function () {
+  const activeTheme = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-bs-theme', activeTheme);
+  localStorage.setItem('theme', activeTheme);
+  updateThemeIcon(activeTheme);
+});
 
 // Custom alert banners (used for non-intrusive status notifications)
 function showBannerAlert(msg, type = 'info', autoDismissMs = 4500) {
@@ -41,7 +56,7 @@ function showBannerAlert(msg, type = 'info', autoDismissMs = 4500) {
   `;
   let $container = $('#alertContainer');
   if (!$container.length) {
-    $container = $('<div id="alertContainer" class="mb-3"></div>').prependTo('main.container');
+    $container = $('<div id="alertContainer" class="mb-4"></div>').prependTo('main.container');
   }
   const $alert = $(html).appendTo($container);
   if (autoDismissMs > 0) {
@@ -72,37 +87,78 @@ $tbl.bootstrapTable({
   showColumns: true,
   showColumnsToggleAll: true,
   iconsPrefix: 'bi',
-  classes: 'table table-hover',
+  classes: 'table table-hover align-middle',
   formatNoMatches: () => 'No items found. Use “Add item” or “Import” to get started.',
   columns: [
-    {field: 'name', title: 'Item', sortable: true,
-     formatter: (v, r) => '<div class="d-flex align-items-center gap-2">' +
-       (r.images.length ? '<img src="' + esc(r.images[0].url) + '" class="rounded border" style="width:40px;height:40px;object-fit:cover" alt="">' : '') +
-       '<div><div class="fw-semibold">' + numfy(v) + '</div>' +
-       (r.notes ? '<div class="small text-body-secondary text-truncate" style="max-width:340px">' + esc(r.notes) + '</div>' : '') +
-       '</div></div>'},
-    {field: 'category', title: 'Category', sortable: true,
-     formatter: v => v ? '<span class="badge text-bg-secondary">' + esc(v) + '</span>'
-                       : '<span class="text-body-secondary">—</span>'},
-    {field: 'location', title: 'Kept at', sortable: true,
-     formatter: v => '<i class="bi bi-geo-alt text-body-secondary"></i> ' + numfy(v)},
-    {field: 'expiry_date', title: 'Expiry', sortable: true, formatter: expFmt},
-    {field: 'status', title: 'Status', sortable: true,
-     formatter: (v, r) => r.taken_out
-       ? '<span class="badge text-bg-warning">Taken out</span>' +
-         '<div class="small">→ ' + esc(r.taken_to) + '</div>' +
-         '<div class="small text-body-secondary">' + esc(r.taken_on) + '</div>'
-       : '<span class="badge text-bg-success">In place</span>'},
+    {
+      field: 'name',
+      title: 'Item',
+      sortable: true,
+      formatter: (v, r) => {
+        const thumb = r.images.length
+          ? `<img src="${esc(r.images[0].url)}" class="rounded-3 border flex-shrink-0" style="width:42px;height:42px;object-fit:cover" alt="">`
+          : `<div class="rounded-3 bg-body-secondary text-body-tertiary d-flex align-items-center justify-content-center border flex-shrink-0" style="width:42px;height:42px"><i class="bi bi-box-seam fs-5"></i></div>`;
+        const notes = r.notes
+          ? `<div class="small text-body-secondary text-truncate" style="max-width:320px">${esc(r.notes)}</div>`
+          : '';
+        return `<div class="d-flex align-items-center gap-3">
+          ${thumb}
+          <div class="overflow-hidden">
+            <div class="fw-semibold text-truncate text-body">${numfy(v)}</div>
+            ${notes}
+          </div>
+        </div>`;
+      }
+    },
+    {
+      field: 'category',
+      title: 'Category',
+      sortable: true,
+      formatter: v => v
+        ? `<span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill px-2.5 py-1.5"><i class="bi bi-tag-fill me-1 opacity-50"></i>${esc(v)}</span>`
+        : `<span class="text-body-tertiary">—</span>`
+    },
+    {
+      field: 'location',
+      title: 'Kept at',
+      sortable: true,
+      formatter: v => `<span class="badge bg-body-secondary text-body rounded-pill px-2.5 py-1.5"><i class="bi bi-geo-alt-fill text-primary me-1"></i>${numfy(v)}</span>`
+    },
+    {
+      field: 'expiry_date',
+      title: 'Expiry',
+      sortable: true,
+      formatter: expFmt
+    },
+    {
+      field: 'status',
+      title: 'Status',
+      sortable: true,
+      formatter: (v, r) => r.taken_out
+        ? `<span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-2.5 py-1.5"><i class="bi bi-box-arrow-up-right me-1"></i>Taken out</span>
+           <div class="small mt-1 text-truncate" style="max-width: 180px;"><span class="text-body-secondary">To:</span> <strong class="text-body">${esc(r.taken_to)}</strong></div>
+           <div class="small text-body-secondary num" style="font-size:0.75rem">${esc(r.taken_on)}</div>`
+        : `<span class="badge bg-success-subtle text-success-emphasis rounded-pill px-2.5 py-1.5"><i class="bi bi-check-circle-fill me-1"></i>In place</span>`
+    },
     {field: 'notes', title: 'Notes', visible: false},
     {field: 'taken_to', title: 'Taken to', visible: false},
-    {field: 'actions', title: 'Actions', align: 'right', switchable: false, searchable: false,
-     formatter: (v, r) => '<div class="text-nowrap">' +
-       (r.taken_out
-         ? '<button class="btn btn-sm btn-success act-return" data-id="' + r.id + '"><i class="bi bi-box-arrow-in-down"></i> Put back</button> '
-         : '<button class="btn btn-sm btn-outline-warning act-take" data-id="' + r.id + '"><i class="bi bi-box-arrow-up-right"></i> Take out</button> ') +
-       '<button class="btn btn-sm btn-outline-secondary act-edit" data-id="' + r.id + '" title="Edit"><i class="bi bi-pencil"></i></button> ' +
-       '<button class="btn btn-sm btn-outline-danger act-delete" data-id="' + r.id + '" title="Delete"><i class="bi bi-trash"></i></button>' +
-       '</div>'}
+    {
+      field: 'actions',
+      title: 'Actions',
+      align: 'right',
+      switchable: false,
+      searchable: false,
+      formatter: (v, r) => {
+        const returnOrTake = r.taken_out
+          ? `<button class="btn btn-sm btn-success act-return" data-id="${r.id}" title="Put back in its place"><i class="bi bi-box-arrow-in-down me-1"></i>Put back</button>`
+          : `<button class="btn btn-sm btn-outline-warning act-take" data-id="${r.id}" title="Take item out"><i class="bi bi-box-arrow-up-right me-1"></i>Take out</button>`;
+        return `<div class="d-inline-flex align-items-center gap-1 text-nowrap">
+          ${returnOrTake}
+          <button class="btn btn-sm btn-outline-secondary act-edit" data-id="${r.id}" title="Edit item"><i class="bi bi-pencil"></i></button>
+          <button class="btn btn-sm btn-outline-danger act-delete" data-id="${r.id}" title="Delete item"><i class="bi bi-trash"></i></button>
+        </div>`;
+      }
+    }
   ]
 });
 
@@ -190,25 +246,43 @@ $tbl.on('post-body.bs.table page-change.bs.table', function () {
 });
 renderPageJump();
 
-// category / status filters
+// Category, Status, and Expiry filters
 function applyFilters() {
   const f = {};
-  const c = $('#fCategory').val(), s = $('#fStatus').val();
+  const c = $('#fCategory').val(), s = $('#fStatus').val(), x = $('#fExpiry').val();
   if (c) f.category = [c];
   if (s) f.status = [s];
-  const x = $('#fExpiry').val();
   if (x) f.expiry_status = [x];
   $tbl.bootstrapTable('filterBy', f);
+
+  // Toggle "Clear filters" button
+  if (c || s || x) {
+    $('#fReset').removeClass('d-none');
+  } else {
+    $('#fReset').addClass('d-none');
+  }
 }
+
 $('#fCategory, #fStatus, #fExpiry').on('change', applyFilters);
+
+$('#fReset').on('click', function () {
+  $('#fCategory').val('');
+  $('#fStatus').val('');
+  $('#fExpiry').val('');
+  applyFilters();
+});
+
 $(document).on('click', '.exp-card', function () {
   $('#fExpiry').val($(this).data('exp'));
   applyFilters();
   document.getElementById('tbl').scrollIntoView({behavior: 'smooth', block: 'center'});
 });
-$(document).on('click', '.attn', function () { showDetail($(this).data('id')); });
 
-// row actions
+$(document).on('click', '.attn', function () {
+  showDetail($(this).data('id'));
+});
+
+// Row actions and modals
 const byId = id => ITEMS.find(x => x.id === id);
 const modal = id => bootstrap.Modal.getOrCreateInstance(document.getElementById(id));
 
@@ -232,14 +306,14 @@ function swapTo(nextId, prep) {
 }
 
 // Modal dialog confirmation utility (replaces native window.confirm / alert)
-function showConfirmDialog({ title, message, confirmBtnText = 'Confirm', confirmBtnClass = 'btn-danger', icon = 'bi-exclamation-triangle', onConfirm, onCancel }) {
+function showConfirmDialog({ title, message, confirmBtnText = 'Confirm', confirmBtnClass = 'btn-danger', icon = 'bi-exclamation-triangle-fill', onConfirm, onCancel }) {
   let isConfirmed = false;
   $('#confirmModalTitle').html(`<i class="bi ${icon} me-2 text-danger"></i>${title}`);
   $('#confirmModalMessage').html(message);
 
   const $btn = $('#confirmExecuteBtn');
   $btn.text(confirmBtnText)
-      .attr('class', `btn ${confirmBtnClass}`);
+      .attr('class', `btn ${confirmBtnClass} px-4`);
 
   $btn.off('click').one('click', function () {
     isConfirmed = true;
@@ -294,9 +368,9 @@ $(document).on('click', '.act-delete', function () {
     showConfirmDialog({
       title: 'Delete Item',
       message: `Are you sure you want to delete <strong>“${esc(it.name)}”</strong>? This action cannot be undone.`,
-      confirmBtnText: 'Delete item',
+      confirmBtnText: 'Delete Item',
       confirmBtnClass: 'btn-danger',
-      icon: 'bi-trash',
+      icon: 'bi-trash-fill',
       onConfirm: () => {
         $('#actionForm').attr('action', '/items/' + it.id + '/delete').trigger('submit');
       },
@@ -321,10 +395,10 @@ $(document).on('click', '.act-del-cat', function () {
   swapModal('catModal', 'confirmModal', () => {
     showConfirmDialog({
       title: 'Delete Category',
-      message: `Delete category <strong>“${esc(catName)}”</strong>? Its items will become uncategorised.`,
-      confirmBtnText: 'Delete category',
+      message: `Are you sure you want to delete category <strong>“${esc(catName)}”</strong>? Its items will become uncategorised.`,
+      confirmBtnText: 'Delete Category',
       confirmBtnClass: 'btn-danger',
-      icon: 'bi-trash',
+      icon: 'bi-trash-fill',
       onConfirm: () => {
         $('#actionForm').attr('action', '/categories/' + catId + '/delete').trigger('submit');
       },
@@ -338,7 +412,7 @@ $(document).on('click', '.act-del-cat', function () {
 document.getElementById('takeModal').addEventListener('shown.bs.modal',
   () => document.getElementById('takeInput').focus());
 
-// ---- item details modal ----
+// ---- Item details modal ----
 function renderImages(it, idx) {
   const n = it.images.length;
   $('#dNoImg').toggleClass('d-none', n > 0);
@@ -351,8 +425,8 @@ function renderImages(it, idx) {
   }
   $('#dThumbs').html(it.images.map((im, i) =>
     '<img src="' + esc(im.url) + '" data-idx="' + i + '" data-item="' + it.id + '" ' +
-    'class="rounded border dthumb' + (i === idx ? ' border-primary border-3' : '') + '" ' +
-    'style="width:64px;height:64px;object-fit:cover;cursor:pointer" alt="">').join(''));
+    'class="rounded-3 border dthumb' + (i === idx ? ' border-primary border-3' : '') + '" ' +
+    'style="width:58px;height:58px;object-fit:cover;cursor:pointer" alt="">').join(''));
 }
 
 function showDetail(id) {
@@ -360,17 +434,17 @@ function showDetail(id) {
   if (!it) return;
   $('#dName').html(numfy(it.name));
   $('#dBadges').html(
-    (it.category ? '<span class="badge text-bg-secondary me-1">' + esc(it.category) + '</span>' : '') +
-    (it.taken_out ? '<span class="badge text-bg-warning">Taken out</span>'
-                  : '<span class="badge text-bg-success">In place</span>'));
+    (it.category ? '<span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill px-2.5 py-1 me-1"><i class="bi bi-tag-fill me-1 opacity-50"></i>' + esc(it.category) + '</span>' : '') +
+    (it.taken_out ? '<span class="badge bg-warning-subtle text-warning-emphasis rounded-pill px-2.5 py-1"><i class="bi bi-box-arrow-up-right me-1"></i>Taken out</span>'
+                  : '<span class="badge bg-success-subtle text-success-emphasis rounded-pill px-2.5 py-1"><i class="bi bi-check-circle-fill me-1"></i>In place</span>'));
   $('#dCat').text(it.category || '—');
   $('#dLoc').text(it.location);
   $('#dStatus').html(it.taken_out
-    ? 'Taken out → <strong>' + esc(it.taken_to) + '</strong><div class="small text-body-secondary">' + esc(it.taken_on) + '</div>'
-    : 'In place');
-  $('#dExp').html(it.expiry_date ? '<span class="num">' + esc(it.expiry_date) + '</span> ' + expBadge(it) : '—');
+    ? 'Taken out &rarr; <strong>' + esc(it.taken_to) + '</strong><div class="small text-body-secondary num">' + esc(it.taken_on) + '</div>'
+    : '<span class="text-success fw-medium"><i class="bi bi-check2-circle me-1"></i>In place</span>');
+  $('#dExp').html(it.expiry_date ? '<span class="num fw-semibold">' + esc(it.expiry_date) + '</span> <span class="ms-1">' + expBadge(it) + '</span>' : '—');
   $('#dAdded').html('<span class="num">' + esc(it.created_at) + '</span>');
-  $('#dNotes').text(it.notes || 'No notes.');
+  $('#dNotes').text(it.notes || 'No notes added for this item.');
   $('#dUpload').attr('action', '/items/' + it.id + '/images').find('input[type=file]').val('');
   $('#dTake, #dReturn, #dEdit, #dDelete').data('id', it.id);
   $('#dTake').toggleClass('d-none', !!it.taken_out);
@@ -396,9 +470,9 @@ $('#dDelImg').on('click', function () {
     showConfirmDialog({
       title: 'Remove Image',
       message: 'Are you sure you want to remove this image? This action cannot be undone.',
-      confirmBtnText: 'Remove image',
+      confirmBtnText: 'Remove Image',
       confirmBtnClass: 'btn-danger',
-      icon: 'bi-trash',
+      icon: 'bi-trash-fill',
       onConfirm: () => {
         $('#actionForm').attr('action', '/images/' + imgId + '/delete').trigger('submit');
       },
@@ -409,6 +483,9 @@ $('#dDelImg').on('click', function () {
   });
 });
 
-// re-open the details after uploading/removing an image
+// Re-open details after uploading/removing an image
 const openId = parseInt(new URLSearchParams(location.search).get('open'), 10);
-if (openId) { showDetail(openId); history.replaceState(null, '', location.pathname); }
+if (openId) {
+  showDetail(openId);
+  history.replaceState(null, '', location.pathname);
+}
