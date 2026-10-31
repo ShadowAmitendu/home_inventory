@@ -1,0 +1,128 @@
+/* ==========================================================================
+   Home Inventory - your UI overrides. Loaded AFTER Bootstrap, so anything here
+   wins. Change colours/fonts/spacing freely; Bootstrap 5.3 reads CSS variables.
+
+   Examples (uncomment):
+   :root { --bs-primary: #0d9488; --bs-primary-rgb: 13,148,136; --bs-border-radius: .75rem; }
+   .navbar-brand { letter-spacing: .02em; }
+   ========================================================================== */
+
+body { background: var(--bs-tertiary-bg); }
+.bootstrap-table .fixed-table-container { border-radius: .375rem; }
+.bootstrap-table .table > :not(caption) > * > * { vertical-align: middle; }
+.fixed-table-toolbar { margin-bottom: .5rem; }
+#tbl tbody tr { cursor: pointer; }
+:root {
+  --bs-body-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bs-font-monospace: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+/* every number uses JetBrains Mono */
+.num, .page-link, .fixed-table-pagination .page-list .btn {
+  font-family: var(--bs-font-monospace);
+  font-variant-numeric: tabular-nums;
+}
+.exp-card, .attn { cursor: pointer; }
+.attn:hover { background: var(--bs-tertiary-bg); }
+
+/* Custom Alert Banners */
+#alertContainer {
+  position: relative;
+  margin-bottom: 1.25rem;
+}
+.alert-custom {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0.85rem 1.15rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-left-width: 4px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  margin-bottom: 0.75rem;
+  background-color: var(--bs-body-bg);
+}
+.alert-custom .alert-icon {
+  font-size: 1.25rem;
+  margin-right: 0.85rem;
+  flex-shrink: 0;
+}
+.alert-custom .alert-content {
+  flex-grow: 1;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.alert-custom.alert-success {
+  border-left-color: var(--bs-success) !important;
+  background-color: rgba(25, 135, 84, 0.08);
+  color: #0f5132;
+}
+.alert-custom.alert-danger {
+  border-left-color: var(--bs-danger) !important;
+  background-color: rgba(220, 53, 69, 0.08);
+  color: #842029;
+}
+.alert-custom.alert-warning {
+  border-left-color: var(--bs-warning) !important;
+  background-color: rgba(255, 193, 7, 0.12);
+  color: #664d03;
+}
+.alert-custom.alert-secondary,
+.alert-custom.alert-info {
+  border-left-color: var(--bs-primary) !important;
+  background-color: rgba(13, 110, 253, 0.08);
+  color: #084298;
+}
+
+[data-bs-theme="dark"] .alert-custom {
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+[data-bs-theme="dark"] .alert-custom.alert-success {
+  background-color: rgba(25, 135, 84, 0.2);
+  color: #75b798;
+}
+[data-bs-theme="dark"] .alert-custom.alert-danger {
+  background-color: rgba(220, 53, 69, 0.2);
+  color: #ea868f;
+}
+[data-bs-theme="dark"] .alert-custom.alert-warning {
+  background-color: rgba(255, 193, 7, 0.2);
+  color: #ffda6a;
+}
+[data-bs-theme="dark"] .alert-custom.alert-secondary,
+[data-bs-theme="dark"] .alert-custom.alert-info {
+  background-color: rgba(13, 110, 253, 0.2);
+  color: #6ea8fe;
+}
+
+/* Pagination: Direct page jump input controls */
+.fixed-table-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.fixed-table-pagination > .pagination {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+}
+.page-jump-container {
+  font-size: 0.875rem;
+}
+.page-jump-container .page-jump-input {
+  width: 58px;
+  height: 31px;
+  padding: 0 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.page-jump-container .page-jump-btn {
+  height: 31px;
+  padding: 0 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1;
+}
