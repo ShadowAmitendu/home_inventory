@@ -42,7 +42,6 @@
 <body>
 
   <!-- Navigation Bar -->
-  <!-- Navigation Bar -->
   <nav class="navbar navbar-expand-lg navbar-main border-bottom mb-3 mb-md-4">
     <div class="container">
       <a class="navbar-brand fw-semibold text-decoration-none d-flex align-items-center" href="{{ url_for('index') }}">
@@ -51,6 +50,9 @@
 
       <!-- Quick mobile actions & hamburger toggler (visible on screens < lg) -->
       <div class="d-flex align-items-center gap-1 d-lg-none">
+        <button class="btn btn-info btn-sm shadow-sm text-white" data-bs-toggle="modal" data-bs-target="#scannerModal" title="Scan Barcode / QR Code">
+          <i class="bi bi-qr-code-scan"></i>
+        </button>
         <button class="btn btn-primary btn-nav-add btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#addModal" title="Add item">
           <i class="bi bi-plus-lg"></i> Add
         </button>
@@ -62,26 +64,125 @@
 
       <!-- Collapsible items -->
       <div class="collapse navbar-collapse mt-2 mt-lg-0" id="navbarContent">
+        <!-- Navigation Links with Dropdowns -->
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
+          <!-- Inventory Dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="inventoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-box-seam-fill me-1"></i>Inventory
+            </a>
+            <ul class="dropdown-menu shadow" aria-labelledby="inventoryDropdown">
+              <li>
+                <button class="dropdown-item d-flex align-items-center justify-content-between" type="button" data-bs-toggle="modal" data-bs-target="#addModal">
+                  <span><i class="bi bi-plus-circle-fill text-primary me-2"></i>Add item</span>
+                  <kbd class="small">N</kbd>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center" type="button" id="navAllItemsBtn">
+                  <i class="bi bi-list-ul text-info me-2"></i>All Items
+                </button>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center justify-content-between" type="button" data-bs-toggle="modal" data-bs-target="#locationTreeModal">
+                  <span><i class="bi bi-diagram-3-fill text-teal me-2"></i>Storage Locations</span>
+                  <kbd class="small">L</kbd>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center" type="button" data-bs-toggle="modal" data-bs-target="#catModal">
+                  <i class="bi bi-tags-fill text-success me-2"></i>Categories
+                </button>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center" type="button" data-bs-toggle="modal" data-bs-target="#importModal">
+                  <i class="bi bi-upload text-warning me-2"></i>Import CSV
+                </button>
+              </li>
+              <li>
+                <a class="dropdown-item d-flex align-items-center" href="{{ url_for('export_csv') }}">
+                  <i class="bi bi-download text-primary me-2"></i>Export CSV
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Locations Direct Navlink -->
+          <li class="nav-item">
+            <a class="nav-link d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#locationTreeModal" title="Room &amp; Location Tree (Key: L)">
+              <i class="bi bi-diagram-3-fill me-1"></i>Locations
+            </a>
+          </li>
+
+          <!-- Tools Dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-tools me-1"></i>Tools
+            </a>
+            <ul class="dropdown-menu shadow" aria-labelledby="toolsDropdown">
+              <li>
+                <button class="dropdown-item d-flex align-items-center justify-content-between" type="button" data-bs-toggle="modal" data-bs-target="#scannerModal">
+                  <span><i class="bi bi-qr-code-scan text-info me-2"></i>Barcode &amp; QR Scanner</span>
+                  <kbd class="small">S</kbd>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center justify-content-between" type="button" data-bs-toggle="modal" data-bs-target="#qrPrintModal">
+                  <span><i class="bi bi-printer-fill text-secondary me-2"></i>Print QR Labels</span>
+                  <kbd class="small">P</kbd>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center justify-content-between" type="button" data-bs-toggle="modal" data-bs-target="#locationTreeModal">
+                  <span><i class="bi bi-diagram-3 text-success me-2"></i>Location Tree</span>
+                  <kbd class="small">L</kbd>
+                </button>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center justify-content-between" type="button" data-bs-toggle="modal" data-bs-target="#backupModal">
+                  <span><i class="bi bi-database-fill-gear text-dark me-2"></i>Backup &amp; Restore</span>
+                  <kbd class="small">B</kbd>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center" type="button" data-bs-toggle="modal" data-bs-target="#networkModal">
+                  <i class="bi bi-wifi text-warning me-2"></i>LAN Access ({{ local_ip }})
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center justify-content-between" type="button" data-bs-toggle="modal" data-bs-target="#shortcutsModal">
+                  <span><i class="bi bi-keyboard text-secondary me-2"></i>Keyboard Shortcuts</span>
+                  <kbd class="small">?</kbd>
+                </button>
+              </li>
+            </ul>
+          </li>
+        </ul>
+
+        <!-- Action Buttons in Navbar -->
         <div class="d-flex flex-wrap gap-2 align-items-center ms-lg-auto pt-2 pt-lg-0">
-          <button class="btn btn-success btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#networkModal" title="Connect other devices on local network">
-            <i class="bi bi-wifi me-1"></i><span class="d-none d-md-inline">LAN: </span><code class="text-white bg-black bg-opacity-25 px-1 rounded">{{ local_ip }}</code>
+          <button class="btn btn-info btn-sm shadow-sm text-white" data-bs-toggle="modal" data-bs-target="#scannerModal" title="Scan Barcodes &amp; QR Codes (Key: S)">
+            <i class="bi bi-qr-code-scan me-1"></i>Scan
           </button>
-          <button class="btn btn-info btn-sm shadow-sm text-white" data-bs-toggle="modal" data-bs-target="#catModal">
-            <i class="bi bi-tags-fill me-1"></i>Categories
+          <button class="btn btn-teal btn-sm shadow-sm text-white d-none d-xl-inline-block" data-bs-toggle="modal" data-bs-target="#locationTreeModal" title="Room &amp; Location Tree (Key: L)">
+            <i class="bi bi-diagram-3-fill me-1"></i>Locations
           </button>
-          <button class="btn btn-secondary btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#importModal">
-            <i class="bi bi-upload me-1"></i>Import
+          <button class="btn btn-secondary btn-sm shadow-sm d-none d-xl-inline-block" data-bs-toggle="modal" data-bs-target="#qrPrintModal" title="Print Storage Box &amp; Item QR Labels (Key: P)">
+            <i class="bi bi-printer-fill me-1"></i>Labels
           </button>
-          <a class="btn btn-dark btn-sm shadow-sm" href="{{ url_for('export_csv') }}">
-            <i class="bi bi-download me-1"></i>Export
-          </a>
-          <button class="btn btn-warning btn-sm shadow-sm text-dark" data-bs-toggle="modal" data-bs-target="#themeModal" title="Choose Bootswatch Theme" id="themePickerBtn">
+          <button class="btn btn-dark btn-sm shadow-sm d-none d-xl-inline-block" data-bs-toggle="modal" data-bs-target="#backupModal" title="Backup &amp; Restore Database (Key: B)">
+            <i class="bi bi-database-fill-gear me-1"></i>Backup
+          </button>
+          <button class="btn btn-warning btn-sm shadow-sm text-dark" data-bs-toggle="modal" data-bs-target="#themeModal" title="Choose Bootswatch Theme (Key: T)" id="themePickerBtn">
             <i class="bi bi-palette-fill me-1"></i><span class="d-inline">Theme: </span><span id="currentThemeLabel" class="fw-semibold">Default</span>
           </button>
-          <button id="themeToggle" class="btn btn-light btn-sm shadow-sm" type="button" title="Toggle dark/light mode">
+          <button id="themeToggle" class="btn btn-light btn-sm shadow-sm" type="button" title="Toggle dark/light mode (Key: D)">
             <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
           </button>
-          <button class="btn btn-primary btn-nav-add btn-sm shadow-sm d-none d-lg-inline-block" data-bs-toggle="modal" data-bs-target="#addModal">
+          <button class="btn btn-primary btn-nav-add btn-sm shadow-sm d-none d-lg-inline-block" data-bs-toggle="modal" data-bs-target="#addModal" title="Add item (Key: N)">
             <i class="bi bi-plus-lg me-1"></i>Add item
           </button>
         </div>
@@ -98,8 +199,8 @@
     {% endwith %}
 
     <!-- Metric Summary Cards (Filter Buttons - Responsive Grid) -->
-    <div class="row g-2 g-md-3 mb-3">
-      <div class="col-12 col-sm-4 col-md">
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-7 g-2 g-md-3 mb-3">
+      <div class="col">
         <div class="card h-100 filter-card" data-filter-type="all" role="button" tabindex="0" title="Click to show all items">
           <div class="card-body py-2 px-3">
             <div class="d-flex align-items-center justify-content-between">
@@ -110,7 +211,7 @@
           </div>
         </div>
       </div>
-      <div class="col-6 col-sm-4 col-md">
+      <div class="col">
         <div class="card h-100 filter-card" data-filter-type="status" data-filter-val="In place" role="button" tabindex="0" title="Click to filter items in place">
           <div class="card-body py-2 px-3">
             <div class="d-flex align-items-center justify-content-between">
@@ -121,7 +222,7 @@
           </div>
         </div>
       </div>
-      <div class="col-6 col-sm-4 col-md">
+      <div class="col">
         <div class="card h-100 filter-card" data-filter-type="status" data-filter-val="Taken out" role="button" tabindex="0" title="Click to filter taken out items">
           <div class="card-body py-2 px-3">
             <div class="d-flex align-items-center justify-content-between">
@@ -132,7 +233,18 @@
           </div>
         </div>
       </div>
-      <div class="col-6 col-sm-6 col-md">
+      <div class="col">
+        <div class="card h-100 filter-card low-stock-card" data-filter-type="stock" data-filter-val="low" role="button" tabindex="0" title="Click to filter low-stock items">
+          <div class="card-body py-2 px-3">
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="text-body-secondary small">Low stock</span>
+              <i class="bi bi-funnel-fill text-danger filter-indicator small d-none" title="Filter active"></i>
+            </div>
+            <div class="fs-4 fw-semibold text-danger num">{{ low_stock }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
         <div class="card h-100 filter-card exp-card" data-filter-type="expiry" data-filter-val="soon" role="button" tabindex="0" title="Click to filter items expiring soon">
           <div class="card-body py-2 px-3">
             <div class="d-flex align-items-center justify-content-between">
@@ -143,7 +255,7 @@
           </div>
         </div>
       </div>
-      <div class="col-6 col-sm-6 col-md">
+      <div class="col">
         <div class="card h-100 filter-card exp-card" data-filter-type="expiry" data-filter-val="expired" role="button" tabindex="0" title="Click to filter expired items">
           <div class="card-body py-2 px-3">
             <div class="d-flex align-items-center justify-content-between">
@@ -151,6 +263,17 @@
               <i class="bi bi-funnel-fill text-danger filter-indicator small d-none" title="Filter active"></i>
             </div>
             <div class="fs-4 fw-semibold text-danger num">{{ expired }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card h-100 filter-card warranty-card" data-filter-type="warranty" data-filter-val="active" role="button" tabindex="0" title="Click to filter items under warranty">
+          <div class="card-body py-2 px-3">
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="text-body-secondary small">Warranty</span>
+              <i class="bi bi-funnel-fill text-info filter-indicator small d-none" title="Filter active"></i>
+            </div>
+            <div class="fs-4 fw-semibold text-info num">{{ active_warranty }}</div>
           </div>
         </div>
       </div>
@@ -193,21 +316,51 @@
       <div class="card-body">
         <!-- Toolbar -->
         <div id="toolbar" class="d-flex flex-wrap gap-2 align-items-center">
-          <select id="fCategory" class="form-select form-select-sm w-auto flex-grow-1 flex-sm-grow-0" style="min-width: 135px;">
+          <select id="fCategory" class="form-select form-select-sm w-auto flex-grow-1 flex-sm-grow-0" style="min-width: 130px;">
             <option value="">All categories</option>
             {% for c in categories %}<option value="{{ c.name }}">{{ c.name }}</option>{% endfor %}
           </select>
-          <select id="fStatus" class="form-select form-select-sm w-auto flex-grow-1 flex-sm-grow-0" style="min-width: 120px;">
+          <select id="fStatus" class="form-select form-select-sm w-auto flex-grow-1 flex-sm-grow-0" style="min-width: 115px;">
             <option value="">Any status</option>
             <option value="In place">In place</option>
             <option value="Taken out">Taken out</option>
           </select>
-          <select id="fExpiry" class="form-select form-select-sm w-auto flex-grow-1 flex-sm-grow-0" style="min-width: 125px;">
+          <select id="fStock" class="form-select form-select-sm w-auto flex-grow-1 flex-sm-grow-0" style="min-width: 115px;">
+            <option value="">Any stock</option>
+            <option value="in_stock">In stock (&gt;0)</option>
+            <option value="low">Low stock</option>
+            <option value="out_of_stock">Out of stock (0)</option>
+          </select>
+          <select id="fTag" class="form-select form-select-sm w-auto flex-grow-1 flex-sm-grow-0" style="min-width: 115px;">
+            <option value="">All tags</option>
+            {% for t in all_tags %}<option value="{{ t }}">#{{ t }}</option>{% endfor %}
+          </select>
+          <select id="fExpiry" class="form-select form-select-sm w-auto flex-grow-1 flex-sm-grow-0" style="min-width: 115px;">
             <option value="">Any expiry</option>
             <option value="expired">Expired</option>
             <option value="soon">Expiring soon</option>
           </select>
-          <button id="fReset" class="btn btn-danger btn-sm shadow-sm d-none flex-grow-1 flex-sm-grow-0" type="button" title="Clear all filters">
+          <select id="fCondition" class="form-select form-select-sm w-auto flex-grow-1 flex-sm-grow-0" style="min-width: 125px;">
+            <option value="">Any condition</option>
+            <option value="Brand New">Brand New</option>
+            <option value="Like New">Like New</option>
+            <option value="Good">Good</option>
+            <option value="Fair">Fair</option>
+            <option value="Poor">Poor</option>
+            <option value="Damaged / Broken">Damaged / Broken</option>
+          </select>
+          <select id="fAmountLeft" class="form-select form-select-sm w-auto flex-grow-1 flex-sm-grow-0" style="min-width: 120px;">
+            <option value="">Any fullness</option>
+            <option value="full">Full (&ge;75%)</option>
+            <option value="medium">Half (25%–74%)</option>
+            <option value="low">Low (&lt;25%)</option>
+            <option value="empty">Empty (0%)</option>
+          </select>
+          <span id="activeLocPill" class="badge bg-primary-subtle text-primary-emphasis border border-primary-subtle d-none align-items-center gap-1 py-1 px-2">
+            <i class="bi bi-geo-alt-fill text-primary"></i> <span id="activeLocName"></span>
+            <button type="button" class="btn-close ms-1" style="font-size: 0.65rem;" id="clearActiveLoc" aria-label="Clear location filter" title="Clear location filter"></button>
+          </span>
+          <button id="fReset" class="btn btn-danger btn-sm shadow-sm d-none flex-grow-1 flex-sm-grow-0" type="button" title="Clear all filters (Key: Esc)">
             <i class="bi bi-x-circle me-1"></i>Clear filters
           </button>
         </div>
@@ -238,7 +391,7 @@
           </div>
         </div>
 
-        <table id="tbl" class="table table-hover"></table>
+        <table id="tbl" class="table table-hover table-sm align-middle"></table>
       </div>
     </div>
   </main>
@@ -259,36 +412,123 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <form class="modal-content" method="post" action="{{ url_for('add_item') }}" enctype="multipart/form-data">
         <div class="modal-header">
-          <h5 class="modal-title" id="addModalTitle">Add item</h5>
+          <h5 class="modal-title" id="addModalTitle"><i class="bi bi-plus-circle text-primary me-2"></i>Add item</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body vstack gap-3">
           <div>
             <label class="form-label">Item name</label>
-            <input class="form-control" name="name" required>
+            <input class="form-control" name="name" id="addNameInput" required>
+          </div>
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <label class="form-label">Category</label>
+              <select class="form-select" name="category_id">
+                <option value="">— None —</option>
+                {% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label mb-0">Where is it kept?</label>
+                <button type="button" class="btn btn-link btn-xs p-0 text-decoration-none btn-gen-loc-code" data-target="#addLocInput" title="Generate next custom box code (e.g. B1-A)">
+                  <i class="bi bi-magic me-1"></i>Gen Code (e.g. B1-A)
+                </button>
+              </div>
+              <div class="input-group input-group-sm">
+                <input class="form-control font-monospace" name="location" id="addLocInput" placeholder="e.g. B1-A" list="locDatalist" required>
+                <button class="btn btn-outline-primary btn-gen-loc-code" type="button" data-target="#addLocInput" title="Generate next box code">
+                  <i class="bi bi-magic"></i>
+                </button>
+              </div>
+              <div class="d-flex flex-wrap gap-1 mt-1 loc-presets" data-target="#addLocInput">
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-loc-btn" data-code="B1-A">B1-A</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-loc-btn" data-code="B1-B">B1-B</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-loc-btn" data-code="B1-C">B1-C</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-loc-btn" data-code="B2-A">B2-A</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-loc-btn" data-code="B2-B">B2-B</button>
+              </div>
+              <datalist id="locDatalist">
+                {% for l in locations %}<option value="{{ l }}">{% endfor %}
+              </datalist>
+            </div>
+          </div>
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label">Quantity</label>
+              <input class="form-control num" type="number" name="quantity" value="1" min="0" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Min Stock Threshold</label>
+              <input class="form-control num" type="number" name="min_quantity" value="0" min="0" title="Alert when quantity is at or below this">
+            </div>
+          </div>
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <label class="form-label">Product Condition</label>
+              <select class="form-select" name="condition" id="addCondition">
+                <option value="">— Unspecified —</option>
+                <option value="Brand New">Brand New</option>
+                <option value="Like New">Like New</option>
+                <option value="Good" selected>Good</option>
+                <option value="Fair">Fair</option>
+                <option value="Poor">Poor</option>
+                <option value="Damaged / Broken">Damaged / Broken</option>
+              </select>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label mb-0">How much left?</label>
+                <span id="addAmountLeftBadge" class="badge bg-secondary-subtle text-secondary-emphasis">N/A</span>
+              </div>
+              <input type="range" class="form-range" id="addAmountLeftRange" min="-1" max="100" step="5" value="-1">
+              <input type="hidden" name="amount_left" id="addAmountLeftInput" value="-1">
+              <div class="d-flex flex-wrap gap-1 mt-1">
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-amount-btn" data-target="add" data-val="-1">N/A</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-amount-btn" data-target="add" data-val="100">100%</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-amount-btn" data-target="add" data-val="75">75%</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-amount-btn" data-target="add" data-val="50">50%</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-amount-btn" data-target="add" data-val="25">25%</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-amount-btn" data-target="add" data-val="0">0%</button>
+              </div>
+            </div>
           </div>
           <div>
-            <label class="form-label">Category</label>
-            <select class="form-select" name="category_id">
-              <option value="">— None —</option>
-              {% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
-            </select>
-          </div>
-          <div>
-            <label class="form-label">Where is it kept?</label>
-            <input class="form-control" name="location" placeholder="e.g. Bedroom, 2nd drawer" required>
+            <label class="form-label">Tags / Labels</label>
+            <input class="form-control" name="tags" placeholder="e.g. tools, spare, fragile (comma separated)">
+            <div class="form-text small">Tags can be used for quick filtering.</div>
           </div>
           <div>
             <label class="form-label">Notes (optional)</label>
             <textarea class="form-control" name="notes" rows="2"></textarea>
           </div>
-          <div>
-            <label class="form-label">Expiry date (optional)</label>
-            <input class="form-control num" type="date" name="expiry_date">
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <label class="form-label">Purchase Date</label>
+              <input class="form-control num" type="date" name="purchase_date">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">Purchase Price</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input class="form-control num" type="number" step="0.01" min="0" name="purchase_price" placeholder="0.00">
+              </div>
+            </div>
+          </div>
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <label class="form-label">Item Expiry Date</label>
+              <input class="form-control num" type="date" name="expiry_date">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">Warranty Expiry</label>
+              <input class="form-control num" type="date" name="warranty_expiry">
+            </div>
           </div>
           <div>
-            <label class="form-label">Images (optional)</label>
-            <input class="form-control" type="file" name="images" accept="image/*" multiple>
+            <label class="form-label">Images / Mobile Camera</label>
+            <input class="form-control" type="file" name="images" accept="image/*" capture="environment" multiple>
+            <div class="form-text small">On mobile, this can open your camera directly.</div>
           </div>
         </div>
         <div class="modal-footer">
@@ -304,7 +544,7 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <form class="modal-content" method="post" id="editForm">
         <div class="modal-header">
-          <h5 class="modal-title" id="editModalTitle">Edit item</h5>
+          <h5 class="modal-title" id="editModalTitle"><i class="bi bi-pencil text-primary me-2"></i>Edit item</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body vstack gap-3">
@@ -312,24 +552,106 @@
             <label class="form-label">Item name</label>
             <input class="form-control" name="name" id="eName" required>
           </div>
-          <div>
-            <label class="form-label">Category</label>
-            <select class="form-select" name="category_id" id="eCat">
-              <option value="">— None —</option>
-              {% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
-            </select>
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <label class="form-label">Category</label>
+              <select class="form-select" name="category_id" id="eCat">
+                <option value="">— None —</option>
+                {% for c in categories %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label mb-0">Where is it kept?</label>
+                <button type="button" class="btn btn-link btn-xs p-0 text-decoration-none btn-gen-loc-code" data-target="#eLoc" title="Generate next custom box code (e.g. B1-A)">
+                  <i class="bi bi-magic me-1"></i>Gen Code (e.g. B1-A)
+                </button>
+              </div>
+              <div class="input-group input-group-sm">
+                <input class="form-control font-monospace" name="location" id="eLoc" list="locDatalist" required>
+                <button class="btn btn-outline-primary btn-gen-loc-code" type="button" data-target="#eLoc" title="Generate next box code">
+                  <i class="bi bi-magic"></i>
+                </button>
+              </div>
+              <div class="d-flex flex-wrap gap-1 mt-1 loc-presets" data-target="#eLoc">
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-loc-btn" data-code="B1-A">B1-A</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-loc-btn" data-code="B1-B">B1-B</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-loc-btn" data-code="B1-C">B1-C</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-loc-btn" data-code="B2-A">B2-A</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-loc-btn" data-code="B2-B">B2-B</button>
+              </div>
+            </div>
+          </div>
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label">Quantity</label>
+              <input class="form-control num" type="number" name="quantity" id="eQty" min="0" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Min Stock Threshold</label>
+              <input class="form-control num" type="number" name="min_quantity" id="eMinQty" min="0">
+            </div>
+          </div>
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <label class="form-label">Product Condition</label>
+              <select class="form-select" name="condition" id="eCondition">
+                <option value="">— Unspecified —</option>
+                <option value="Brand New">Brand New</option>
+                <option value="Like New">Like New</option>
+                <option value="Good">Good</option>
+                <option value="Fair">Fair</option>
+                <option value="Poor">Poor</option>
+                <option value="Damaged / Broken">Damaged / Broken</option>
+              </select>
+            </div>
+            <div class="col-sm-6">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label mb-0">How much left?</label>
+                <span id="eAmountLeftBadge" class="badge bg-secondary-subtle text-secondary-emphasis">N/A</span>
+              </div>
+              <input type="range" class="form-range" id="eAmountLeftRange" min="-1" max="100" step="5" value="-1">
+              <input type="hidden" name="amount_left" id="eAmountLeftInput" value="-1">
+              <div class="d-flex flex-wrap gap-1 mt-1">
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-amount-btn" data-target="e" data-val="-1">N/A</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-amount-btn" data-target="e" data-val="100">100%</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-amount-btn" data-target="e" data-val="75">75%</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-amount-btn" data-target="e" data-val="50">50%</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-amount-btn" data-target="e" data-val="25">25%</button>
+                <button type="button" class="btn btn-outline-secondary btn-xs py-0 px-1 preset-amount-btn" data-target="e" data-val="0">0%</button>
+              </div>
+            </div>
           </div>
           <div>
-            <label class="form-label">Where is it kept?</label>
-            <input class="form-control" name="location" id="eLoc" required>
+            <label class="form-label">Tags / Labels</label>
+            <input class="form-control" name="tags" id="eTags" placeholder="e.g. tools, spare, fragile">
           </div>
           <div>
             <label class="form-label">Notes</label>
             <textarea class="form-control" name="notes" id="eNotes" rows="3"></textarea>
           </div>
-          <div>
-            <label class="form-label">Expiry date</label>
-            <input class="form-control num" type="date" name="expiry_date" id="eExp">
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <label class="form-label">Purchase Date</label>
+              <input class="form-control num" type="date" name="purchase_date" id="ePurchDate">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">Purchase Price</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input class="form-control num" type="number" step="0.01" min="0" name="purchase_price" id="ePurchPrice">
+              </div>
+            </div>
+          </div>
+          <div class="row g-2">
+            <div class="col-sm-6">
+              <label class="form-label">Item Expiry Date</label>
+              <input class="form-control num" type="date" name="expiry_date" id="eExp">
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label">Warranty Expiry</label>
+              <input class="form-control num" type="date" name="warranty_expiry" id="eWarrantyExp">
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -368,7 +690,7 @@
         <div class="modal-header">
           <div>
             <h4 class="modal-title mb-0" id="dName"></h4>
-            <div id="dBadges" class="mt-1"></div>
+            <div id="dBadges" class="mt-1 d-flex flex-wrap gap-1 align-items-center"></div>
           </div>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -391,21 +713,66 @@
               </div>
               <div id="dThumbs" class="d-flex flex-wrap gap-2 mt-2"></div>
               <form id="dUpload" method="post" enctype="multipart/form-data" class="input-group mt-3">
-                <input class="form-control" type="file" name="images" accept="image/*" multiple required>
-                <button class="btn btn-primary"><i class="bi bi-cloud-upload"></i> Upload</button>
+                <input class="form-control" type="file" name="images" accept="image/*" capture="environment" multiple required>
+                <button class="btn btn-primary"><i class="bi bi-cloud-upload me-1"></i> Upload</button>
               </form>
             </div>
             <div class="col-lg-6">
-              <dl class="row mb-0">
-                <dt class="col-sm-4">Category</dt>
+              <dl class="row mb-0 gy-2">
+                <dt class="col-sm-4 text-body-secondary">Category</dt>
                 <dd class="col-sm-8" id="dCat"></dd>
-                <dt class="col-sm-4">Kept at</dt>
+
+                <dt class="col-sm-4 text-body-secondary">Kept at</dt>
                 <dd class="col-sm-8" id="dLoc"></dd>
-                <dt class="col-sm-4">Status</dt>
+
+                <dt class="col-sm-4 text-body-secondary">Stock / Quantity</dt>
+                <dd class="col-sm-8" id="dQtyWrapper">
+                  <div class="d-inline-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-2 py-0" id="dQtyMinusBtn" title="Decrease quantity by 1">&minus;</button>
+                    <span id="dQty" class="fs-5 fw-bold num">1</span>
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-2 py-0" id="dQtyPlusBtn" title="Increase quantity by 1">&#43;</button>
+                    <span id="dStockBadge" class="ms-1"></span>
+                  </div>
+                  <div class="small text-body-secondary mt-1">Min threshold: <span id="dMinQty" class="num">0</span></div>
+                </dd>
+
+                <dt class="col-sm-4 text-body-secondary">Status</dt>
                 <dd class="col-sm-8" id="dStatus"></dd>
-                <dt class="col-sm-4">Expiry</dt>
+
+                <dt class="col-sm-4 text-body-secondary">Condition</dt>
+                <dd class="col-sm-8" id="dCondition">—</dd>
+
+                <dt class="col-sm-4 text-body-secondary">How Much Left</dt>
+                <dd class="col-sm-8" id="dAmountLeftWrapper">
+                  <div class="d-flex align-items-center gap-2 mb-1">
+                    <div class="progress flex-grow-1" style="height: 12px; max-width: 180px;" id="dAmountLeftProgress">
+                      <div class="progress-bar" id="dAmountLeftBar" role="progressbar" style="width: 0%;"></div>
+                    </div>
+                    <span id="dAmountLeftText" class="fw-bold num small">—</span>
+                  </div>
+                  <div class="btn-group btn-group-sm mt-1" role="group" aria-label="Adjust fullness">
+                    <button type="button" class="btn btn-outline-secondary py-0 px-2 act-level-adjust" data-delta="-10" title="Decrease 10%">&minus;10%</button>
+                    <button type="button" class="btn btn-outline-secondary py-0 px-2 act-level-adjust" data-delta="10" title="Increase 10%">+10%</button>
+                    <button type="button" class="btn btn-outline-secondary py-0 px-2 act-level-set" data-val="100" title="Set to 100%">100%</button>
+                    <button type="button" class="btn btn-outline-secondary py-0 px-2 act-level-set" data-val="50" title="Set to 50%">50%</button>
+                    <button type="button" class="btn btn-outline-secondary py-0 px-2 act-level-set" data-val="0" title="Set to 0%">Empty</button>
+                    <button type="button" class="btn btn-outline-secondary py-0 px-2 act-level-set" data-val="-1" title="Set to N/A">N/A</button>
+                  </div>
+                </dd>
+
+                <dt class="col-sm-4 text-body-secondary">Tags</dt>
+                <dd class="col-sm-8" id="dTags">—</dd>
+
+                <dt class="col-sm-4 text-body-secondary">Expiry</dt>
                 <dd class="col-sm-8" id="dExp"></dd>
-                <dt class="col-sm-4">Added on</dt>
+
+                <dt class="col-sm-4 text-body-secondary">Warranty</dt>
+                <dd class="col-sm-8" id="dWarranty">—</dd>
+
+                <dt class="col-sm-4 text-body-secondary">Purchase Details</dt>
+                <dd class="col-sm-8" id="dPurchase">—</dd>
+
+                <dt class="col-sm-4 text-body-secondary">Added on</dt>
                 <dd class="col-sm-8" id="dAdded"></dd>
               </dl>
               <hr>
@@ -414,11 +781,19 @@
             </div>
           </div>
         </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" id="dDelete" class="btn btn-danger act-delete">
-            <i class="bi bi-trash"></i> Delete
-          </button>
+        <div class="modal-footer justify-content-between flex-wrap gap-2">
           <div class="d-flex gap-2">
+            <button type="button" id="dDelete" class="btn btn-danger act-delete">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+            <button type="button" id="dHistoryBtn" class="btn btn-outline-info">
+              <i class="bi bi-clock-history me-1"></i> History
+            </button>
+            <button type="button" id="dPrintQrBtn" class="btn btn-outline-secondary">
+              <i class="bi bi-qr-code me-1"></i> Print Label
+            </button>
+          </div>
+          <div class="d-flex gap-2 ms-auto">
             <button type="button" id="dEdit" class="btn btn-primary act-edit">
               <i class="bi bi-pencil"></i> Edit
             </button>
@@ -567,8 +942,8 @@
               <option value="keep">— Keep existing locations —</option>
               <option value="set">Move all to new location &rarr;</option>
             </select>
-            <input class="form-control mt-2 d-none" name="location" id="bulkLocInput"
-              placeholder="e.g. Storeroom Shelf 3">
+            <input class="form-control font-monospace mt-2 d-none" name="location" id="bulkLocInput"
+              placeholder="e.g. B1-A" list="locDatalist">
           </div>
 
           <div>
@@ -590,6 +965,54 @@
               <option value="set">Set new expiry date &rarr;</option>
             </select>
             <input class="form-control num mt-2 d-none" type="date" name="expiry_date" id="bulkExpInput">
+          </div>
+
+          <div>
+            <label class="form-label">Quantity</label>
+            <select class="form-select" name="quantity_action" id="bulkQtyAction">
+              <option value="keep">— Keep existing quantities —</option>
+              <option value="set">Set specific quantity &rarr;</option>
+              <option value="add">Add / increment by amount &rarr;</option>
+            </select>
+            <input class="form-control num mt-2 d-none" type="number" name="quantity_val" id="bulkQtyVal" placeholder="1">
+          </div>
+
+          <div>
+            <label class="form-label">Tags / Labels</label>
+            <select class="form-select" name="tags_action" id="bulkTagsAction">
+              <option value="keep">— Keep existing tags —</option>
+              <option value="append">Add / append tag(s) &rarr;</option>
+              <option value="set">Replace all tags with &rarr;</option>
+              <option value="clear">Clear all tags</option>
+            </select>
+            <input class="form-control mt-2 d-none" name="tags_val" id="bulkTagsVal" placeholder="e.g. tools, garage">
+          </div>
+
+          <div>
+            <label class="form-label">Product Condition</label>
+            <select class="form-select" name="condition_action" id="bulkCondAction">
+              <option value="keep">— Keep existing condition —</option>
+              <option value="clear">Clear condition</option>
+              <option value="set">Set condition to &rarr;</option>
+            </select>
+            <select class="form-select mt-2 d-none" name="condition_val" id="bulkCondVal">
+              <option value="Brand New">Brand New</option>
+              <option value="Like New">Like New</option>
+              <option value="Good">Good</option>
+              <option value="Fair">Fair</option>
+              <option value="Poor">Poor</option>
+              <option value="Damaged / Broken">Damaged / Broken</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label">How Much Left (Fullness)</label>
+            <select class="form-select" name="amount_left_action" id="bulkAmountLeftAction">
+              <option value="keep">— Keep existing fullness —</option>
+              <option value="clear">Mark as N/A (non-consumable)</option>
+              <option value="set">Set percentage left &rarr;</option>
+            </select>
+            <input class="form-control num mt-2 d-none" type="number" min="0" max="100" name="amount_left_val" id="bulkAmountLeftVal" placeholder="0 - 100 (%)">
           </div>
 
           <div>
@@ -761,11 +1184,386 @@
     </div>
   </div>
 
+  <!-- Modal: Barcode & QR Code Scanner (1.1) -->
+  <div class="modal fade" id="scannerModal" tabindex="-1" aria-labelledby="scannerModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="scannerModalTitle">
+            <i class="bi bi-qr-code-scan text-info me-2"></i>Barcode &amp; QR Code Scanner
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="nav nav-pills nav-fill mb-3" id="scannerTabs" role="tablist">
+            <li class="nav-item">
+              <button class="nav-link active btn-sm" id="tabCameraBtn" data-bs-toggle="pill" data-bs-target="#tabCamera" type="button">
+                <i class="bi bi-camera me-1"></i>Live Camera
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link btn-sm" id="tabFileBtn" data-bs-toggle="pill" data-bs-target="#tabFileScan" type="button">
+                <i class="bi bi-image me-1"></i>Scan Image
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link btn-sm" id="tabManualBtn" data-bs-toggle="pill" data-bs-target="#tabManual" type="button">
+                <i class="bi bi-keyboard me-1"></i>Type Code
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <!-- Camera View -->
+            <div class="tab-pane fade show active" id="tabCamera">
+              <div class="mb-2 d-flex gap-2">
+                <select class="form-select form-select-sm" id="scannerCameraSelect">
+                  <option value="">Detecting cameras...</option>
+                </select>
+                <button type="button" class="btn btn-sm btn-primary text-nowrap" id="scannerToggleBtn">
+                  <i class="bi bi-play-fill me-1"></i>Start
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-warning text-nowrap d-none" id="scannerTorchBtn" title="Toggle Flashlight">
+                  <i class="bi bi-lightning-fill"></i>
+                </button>
+              </div>
+              <div id="qr-reader" class="rounded overflow-hidden bg-black position-relative" style="min-height: 240px; max-width: 100%;">
+                <div id="qrReaderPlaceholder" class="d-flex flex-column align-items-center justify-content-center text-secondary h-100 py-5">
+                  <i class="bi bi-camera-video fs-1 mb-2"></i>
+                  <span>Click "Start" to activate camera scanner</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Image File Scan -->
+            <div class="tab-pane fade" id="tabFileScan">
+              <div class="p-4 border border-dashed rounded text-center bg-body-tertiary">
+                <i class="bi bi-file-earmark-image fs-1 text-primary mb-2"></i>
+                <h6>Choose an image with a barcode or QR code</h6>
+                <p class="small text-body-secondary mb-3">Upload a photo, screenshot, or product label.</p>
+                <input type="file" id="scannerFileInput" class="form-control" accept="image/*" capture="environment">
+              </div>
+            </div>
+
+            <!-- Manual Barcode Entry -->
+            <div class="tab-pane fade" id="tabManual">
+              <div class="input-group">
+                <input type="text" id="scannerManualInput" class="form-control font-monospace" placeholder="Enter barcode number or item ID...">
+                <button class="btn btn-primary" type="button" id="scannerManualBtn"><i class="bi bi-search me-1"></i>Lookup</button>
+              </div>
+              <div class="form-text small mt-1">Accepts item IDs (e.g. <code>12</code>), item QR codes (e.g. <code>item:12</code>), location codes (e.g. <code>loc:Kitchen</code>), or product barcodes.</div>
+            </div>
+          </div>
+
+          <!-- Detected Result Box -->
+          <div id="scannerResultBox" class="mt-3 d-none">
+            <div class="card border-primary">
+              <div class="card-header bg-primary-subtle text-primary-emphasis py-2 d-flex justify-content-between align-items-center">
+                <span class="fw-semibold"><i class="bi bi-check-circle-fill text-success me-1"></i> Code Detected</span>
+                <span class="badge text-bg-primary font-monospace" id="scannerResultFormat">QR</span>
+              </div>
+              <div class="card-body py-2">
+                <div class="fw-semibold font-monospace small text-break mb-2" id="scannerResultRaw"></div>
+                <div id="scannerItemPreview" class="d-none border rounded p-2 mb-2 bg-body-tertiary d-flex align-items-center gap-2">
+                  <img id="scannerItemImg" class="rounded border d-none" style="width:48px;height:48px;object-fit:cover;" alt="">
+                  <div>
+                    <h6 class="mb-0 fw-semibold" id="scannerItemName"></h6>
+                    <div class="small text-body-secondary"><i class="bi bi-geo-alt"></i> <span id="scannerItemLoc"></span></div>
+                  </div>
+                </div>
+                <div class="d-flex flex-wrap gap-2" id="scannerActionBtns">
+                  <!-- Dynamic action buttons added here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Storage Box & Item QR Code Generator / Label Printer (1.2) -->
+  <div class="modal fade" id="qrPrintModal" tabindex="-1" aria-labelledby="qrPrintModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="qrPrintModalTitle">
+            <i class="bi bi-printer-fill text-secondary me-2"></i>Storage Box &amp; Item QR Label Printer
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-5">
+              <label class="form-label fw-semibold">Label Type</label>
+              <select class="form-select mb-3" id="qrLabelTypeSelect">
+                <option value="item">Item QR Label</option>
+                <option value="location">Storage Box / Room Label</option>
+                <option value="batch">Batch Labels (All Items)</option>
+              </select>
+
+              <!-- Single Item Selection -->
+              <div id="qrItemSelectGroup" class="mb-3">
+                <label class="form-label">Select Item</label>
+                <select class="form-select form-select-sm" id="qrItemSelect">
+                  {% for it in items %}
+                  <option value="{{ it.id }}">{{ it.name }} ({{ it.location }})</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Location Selection -->
+              <div id="qrLocSelectGroup" class="mb-3 d-none">
+                <label class="form-label">Select Location / Box</label>
+                <input class="form-control form-select-sm mb-2" id="qrLocCustomInput" placeholder="Select or type location..." list="printLocList">
+                <datalist id="printLocList">
+                  {% for l in locations %}<option value="{{ l }}">{% endfor %}
+                </datalist>
+                <div class="form-text small">Scanning this box QR code will instantly show all items inside this box or location!</div>
+              </div>
+
+              <!-- Batch Label Options -->
+              <div id="qrBatchSelectGroup" class="mb-3 d-none">
+                <label class="form-label">Batch Options</label>
+                <select class="form-select form-select-sm" id="qrBatchFilterSelect">
+                  <option value="all">All items ({{ total }})</option>
+                  <option value="selected">Selected items only (<span id="qrBatchSelectedCount">0</span>)</option>
+                  <option value="in_place">In place items only</option>
+                </select>
+              </div>
+
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="qrIncludeText" checked>
+                <label class="form-check-label small" for="qrIncludeText">Include Location &amp; Details</label>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="qrIncludeDate" checked>
+                <label class="form-check-label small" for="qrIncludeDate">Include Date &amp; URL</label>
+              </div>
+
+              <button type="button" class="btn btn-primary w-100 shadow-sm" id="triggerPrintBtn">
+                <i class="bi bi-printer me-1"></i> Print Label(s)
+              </button>
+            </div>
+
+            <!-- Live Label Preview Column -->
+            <div class="col-md-7">
+              <label class="form-label fw-semibold text-body-secondary small">Print Preview</label>
+              <div class="p-3 bg-body-tertiary rounded border d-flex flex-column align-items-center justify-content-center" style="min-height: 280px;">
+                <div id="qrSingleLabelPreview" class="qr-printable-label shadow-sm bg-white text-dark p-3 rounded border text-center" style="max-width: 320px; width: 100%;">
+                  <div class="fw-bold fs-5 text-truncate" id="labelPreviewTitle">Item Name</div>
+                  <div class="small text-muted mb-2" id="labelPreviewSubtitle">Location</div>
+                  <div id="labelPreviewQr" class="d-flex justify-content-center my-2"></div>
+                  <div class="small font-monospace text-muted mt-2" id="labelPreviewFooter">Scan with Home Inventory</div>
+                </div>
+                <div id="qrBatchNotice" class="d-none text-center p-3">
+                  <i class="bi bi-grid-3x3-gap-fill fs-2 text-primary"></i>
+                  <h6 class="mt-2">Batch Sheet Ready</h6>
+                  <p class="small text-body-secondary mb-0">Clicking Print will generate a clean multi-label sticker sheet.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Location Tree / Room Explorer (3.1) -->
+  <div class="modal fade" id="locationTreeModal" tabindex="-1" aria-labelledby="locationTreeModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="locationTreeModalTitle">
+            <i class="bi bi-diagram-3-fill text-teal me-2"></i>Location Tree &amp; Room Explorer
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-body-secondary small mb-3">
+            Browse items room-by-room or by storage boxes. Click any location to filter the inventory view.
+          </p>
+
+          <div class="input-group mb-3">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="locTreeSearchInput" placeholder="Filter locations (e.g. Bedroom, Shelf)...">
+          </div>
+
+          <div id="locationTreeContainer" class="list-group shadow-sm">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="locTreeExpandAllBtn">
+            <i class="bi bi-arrows-expand me-1"></i>Expand All
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Item Activity & Movement History (3.2) -->
+  <div class="modal fade" id="historyModal" tabindex="-1" aria-labelledby="historyModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="historyModalTitle">
+            <i class="bi bi-clock-history text-info me-2"></i>Activity History
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <h6 class="fw-semibold mb-0" id="histItemName"></h6>
+            <div class="small text-body-secondary" id="histItemMeta"></div>
+          </div>
+          <hr class="my-2">
+          <div id="histTimelineContainer" class="timeline-wrapper py-2">
+            <!-- Timeline items populated dynamically -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Database Backup & Restore (4.2) -->
+  <div class="modal fade" id="backupModal" tabindex="-1" aria-labelledby="backupModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="backupModalTitle">
+            <i class="bi bi-database-fill-gear text-dark me-2"></i>Database Backup &amp; Restore
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body vstack gap-4">
+          <!-- Download Backup -->
+          <div class="card bg-body-tertiary border-0">
+            <div class="card-body p-3">
+              <h6 class="fw-semibold d-flex align-items-center mb-1">
+                <i class="bi bi-cloud-arrow-down text-primary fs-5 me-2"></i>Download Snapshot
+              </h6>
+              <p class="small text-body-secondary mb-3">
+                Download a complete, portable SQLite database backup (<code>.db</code>) with all {{ total }} items, history logs, tags, and settings.
+              </p>
+              <a href="{{ url_for('download_backup') }}" class="btn btn-primary btn-sm shadow-sm" id="downloadBackupBtn">
+                <i class="bi bi-download me-1"></i>Download Database Backup (.db)
+              </a>
+            </div>
+          </div>
+
+          <!-- Restore Backup -->
+          <div class="card border-warning-subtle">
+            <div class="card-body p-3">
+              <h6 class="fw-semibold text-warning-emphasis d-flex align-items-center mb-1">
+                <i class="bi bi-cloud-arrow-up text-warning fs-5 me-2"></i>Restore From Backup
+              </h6>
+              <p class="small text-body-secondary mb-3">
+                Upload a previously saved <code>.db</code> file. A backup copy of your current database (<code>inventory.db.bak</code>) is automatically preserved on the server before replacement.
+              </p>
+              <form method="post" action="{{ url_for('restore_backup') }}" enctype="multipart/form-data" id="restoreBackupForm">
+                <div class="mb-3">
+                  <input class="form-control form-control-sm" type="file" name="backup_file" accept=".db,.sqlite,.sqlite3" required id="restoreFileInput">
+                </div>
+                <button type="button" class="btn btn-danger btn-sm shadow-sm" id="restoreSubmitBtn">
+                  <i class="bi bi-arrow-repeat me-1"></i>Restore Database
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Keyboard Shortcuts (4.3) -->
+  <div class="modal fade" id="shortcutsModal" tabindex="-1" aria-labelledby="shortcutsModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="shortcutsModalTitle">
+            <i class="bi bi-keyboard text-secondary me-2"></i>Keyboard Shortcuts
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <span>Focus search input</span>
+              <kbd>/</kbd> or <kbd>Ctrl+K</kbd>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <span>Add new item</span>
+              <kbd>N</kbd>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <span>Open Barcode &amp; QR Scanner</span>
+              <kbd>S</kbd>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <span>Print QR Labels</span>
+              <kbd>P</kbd>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <span>Location Tree Explorer</span>
+              <kbd>L</kbd>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <span>Database Backup &amp; Restore</span>
+              <kbd>B</kbd>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <span>Bootswatch Theme Picker</span>
+              <kbd>T</kbd>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <span>Toggle Dark / Light Theme</span>
+              <kbd>D</kbd>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <span>Close open modal / Clear filters</span>
+              <kbd>Esc</kbd>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center py-2 px-3">
+              <span>Show keyboard shortcuts</span>
+              <kbd>?</kbd>
+            </li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dedicated Printable Container for Labels & Box QR Codes (1.2) -->
+  <div id="printableArea" class="d-none"></div>
+
   <script src="{{ url_for('static', filename='vendor/jquery/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
   <script src="{{ url_for('static', filename='vendor/bootstrap-table/bootstrap-table.min.js') }}"></script>
   <script src="{{ url_for('static', filename='vendor/gsap/gsap.min.js') }}"></script>
-  <script>const ITEMS = {{ items| tojson }};</script>
+  <script src="{{ url_for('static', filename='vendor/qr/html5-qrcode.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/qr/qrcode.min.js') }}"></script>
+  <script>
+    const ITEMS = {{ items | tojson }};
+    const ALL_LOCATIONS = {{ locations | tojson }};
+    const ALL_TAGS = {{ all_tags | tojson }};
+  </script>
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 
