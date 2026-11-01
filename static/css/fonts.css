@@ -1,4 +1,26 @@
-/* Local fonts: Inter (UI) and JetBrains Mono (numbers) */
+/* Local fonts: Inter Display (Headings), Inter (Body UI), JetBrains Mono (Numbers & Monospace) */
+@font-face {
+  font-family: 'Inter Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../vendor/fonts/inter-display-medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../vendor/fonts/inter-display-semibold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../vendor/fonts/inter-display-bold.woff2') format('woff2');
+}
+
 @font-face {
   font-family: 'Inter';
   font-style: normal;

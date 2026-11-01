@@ -13,6 +13,7 @@ import csv
 import io
 import os
 import secrets
+import socket
 import sqlite3
 import threading
 import webbrowser
@@ -39,6 +40,37 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 def too_large(_e):
     flash("Upload too large (limit is 25 MB per upload).", "danger")
     return redirect(url_for("index"))
+
+
+SERVER_PORT = int(os.environ.get("PORT", 5000))
+
+
+def get_local_ip():
+    """Retrieve the primary local area network (LAN) IPv4 address."""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # Connect to a dummy public IP: does not send packets or establish a connection
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        try:
+            return socket.gethostbyname(socket.gethostname())
+        except Exception:
+            return "127.0.0.1"
+
+
+@app.context_processor
+def inject_network_info():
+    """Inject local network IP, active port, and connection URL into all templates."""
+    ip = get_local_ip()
+    port = request.host.split(":")[-1] if ":" in request.host else str(SERVER_PORT)
+    return {
+        "local_ip": ip,
+        "server_port": port,
+        "network_url": f"http://{ip}:{port}",
+    }
 
 DEFAULT_CATEGORIES = ["Kitchen", "Tools", "Documents", "Electronics",
                       "Clothing", "Books", "Other"]
@@ -388,6 +420,154 @@ def delete_item(item_id):
     return redirect(url_for("index"))
 
 
+@app.post("/items/bulk-delete")
+def bulk_delete_items():
+    ids = [int(i) for i in request.form.getlist("ids") if str(i).isdigit()]
+    if not ids:
+        ids_str = request.form.get("ids", "").strip()
+        if ids_str:
+            ids = [int(i.strip()) for i in ids_str.split(",") if i.strip().isdigit()]
+    if not ids:
+        flash("No items selected.", "warning")
+        return redirect(url_for("index"))
+
+    db = get_db()
+    placeholders = ",".join("?" for _ in ids)
+    files = [r["filename"] for r in db.execute(
+        f"SELECT filename FROM item_images WHERE item_id IN ({placeholders})", ids)]
+    db.execute(f"DELETE FROM items WHERE id IN ({placeholders})", ids)
+    remove_files(files)
+    db.commit()
+    count = len(ids)
+    flash(f"Deleted {count} item{'s' if count != 1 else ''}.", "secondary")
+    return redirect(url_for("index"))
+
+
+@app.post("/items/bulk-edit")
+def bulk_edit_items():
+    ids = [int(i) for i in request.form.getlist("ids") if str(i).isdigit()]
+    if not ids:
+        ids_str = request.form.get("ids", "").strip()
+        if ids_str:
+            ids = [int(i.strip()) for i in ids_str.split(",") if i.strip().isdigit()]
+    if not ids:
+        flash("No items selected.", "warning")
+        return redirect(url_for("index"))
+
+    db = get_db()
+    updates = []
+    params = []
+
+    # Category action
+    cat_action = request.form.get("category_action", "keep")
+    if cat_action == "clear":
+        updates.append("category_id = NULL")
+    elif cat_action == "set":
+        cat_id = category_or_none(request.form.get("category_id"))
+        updates.append("category_id = ?")
+        params.append(cat_id)
+
+    # Location action
+    loc_action = request.form.get("location_action", "keep")
+    if loc_action == "set":
+        new_loc = request.form.get("location", "").strip()
+        if new_loc:
+            updates.append("location = ?")
+            params.append(new_loc)
+
+    # Status action
+    status_action = request.form.get("status_action", "keep")
+    if status_action == "return":
+        updates.append("taken_out = 0, taken_to = '', taken_on = ''")
+    elif status_action == "take":
+        where = request.form.get("taken_to", "").strip() or "Unknown"
+        updates.append("taken_out = 1, taken_to = ?, taken_on = ?")
+        params.extend([where, now()])
+
+    # Expiry action
+    exp_action = request.form.get("expiry_action", "keep")
+    if exp_action == "clear":
+        updates.append("expiry_date = ''")
+    elif exp_action == "set":
+        exp = parse_date(request.form.get("expiry_date", ""))
+        updates.append("expiry_date = ?")
+        params.append(exp)
+
+    # Notes action
+    notes_action = request.form.get("notes_action", "keep")
+    if notes_action == "clear":
+        updates.append("notes = ''")
+    elif notes_action == "replace":
+        n_text = request.form.get("notes_text", "").strip()
+        updates.append("notes = ?")
+        params.append(n_text)
+    elif notes_action == "append":
+        n_text = request.form.get("notes_text", "").strip()
+        if n_text:
+            updates.append("notes = CASE WHEN notes IS NULL OR notes = '' THEN ? ELSE notes || CHAR(10) || ? END")
+            params.extend([n_text, n_text])
+
+    if not updates:
+        flash("No changes were specified for bulk edit.", "warning")
+        return redirect(url_for("index"))
+
+    placeholders = ",".join("?" for _ in ids)
+    sql = f"UPDATE items SET {', '.join(updates)} WHERE id IN ({placeholders})"
+    params.extend(ids)
+    db.execute(sql, params)
+    db.commit()
+
+    count = len(ids)
+    flash(f"Updated {count} item{'s' if count != 1 else ''}.", "success")
+    return redirect(url_for("index"))
+
+
+@app.post("/items/bulk-take")
+def bulk_take_items():
+    ids = [int(i) for i in request.form.getlist("ids") if str(i).isdigit()]
+    if not ids:
+        ids_str = request.form.get("ids", "").strip()
+        if ids_str:
+            ids = [int(i.strip()) for i in ids_str.split(",") if i.strip().isdigit()]
+    if not ids:
+        flash("No items selected.", "warning")
+        return redirect(url_for("index"))
+
+    where = request.form.get("taken_to", "").strip()
+    if not where:
+        flash("Tell me where they went (room, person, bag...).", "danger")
+        return redirect(url_for("index"))
+
+    db = get_db()
+    placeholders = ",".join("?" for _ in ids)
+    db.execute(f"UPDATE items SET taken_out = 1, taken_to = ?, taken_on = ? WHERE id IN ({placeholders})",
+               [where, now()] + ids)
+    db.commit()
+    count = len(ids)
+    flash(f"Marked {count} item{'s' if count != 1 else ''} as taken out.", "warning")
+    return redirect(url_for("index"))
+
+
+@app.post("/items/bulk-return")
+def bulk_return_items():
+    ids = [int(i) for i in request.form.getlist("ids") if str(i).isdigit()]
+    if not ids:
+        ids_str = request.form.get("ids", "").strip()
+        if ids_str:
+            ids = [int(i.strip()) for i in ids_str.split(",") if i.strip().isdigit()]
+    if not ids:
+        flash("No items selected.", "warning")
+        return redirect(url_for("index"))
+
+    db = get_db()
+    placeholders = ",".join("?" for _ in ids)
+    db.execute(f"UPDATE items SET taken_out = 0, taken_to = '', taken_on = '' WHERE id IN ({placeholders})", ids)
+    db.commit()
+    count = len(ids)
+    flash(f"Marked {count} item{'s' if count != 1 else ''} as back in place.", "success")
+    return redirect(url_for("index"))
+
+
 @app.get("/uploads/<path:name>")
 def uploaded_file(name):
     return send_from_directory(UPLOAD_DIR, name)
@@ -516,9 +696,18 @@ def open_browser(port=5000):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", SERVER_PORT))
     debug_mode = True
+    local_ip = get_local_ip()
+
+    print("\n" + "=" * 58)
+    print("  Home Inventory is running!")
+    print(f"  -> Local:   http://127.0.0.1:{port}")
+    print(f"  -> Network: http://{local_ip}:{port}")
+    print("  Connect phones, tablets, or PCs on the same Wi-Fi/LAN.")
+    print("=" * 58 + "\n")
+
     # Auto-open browser tab once on start (guarded against Werkzeug reloader double-trigger)
     if not debug_mode or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
         threading.Timer(1.2, lambda: open_browser(port)).start()
-    app.run(debug=debug_mode, port=port)
+    app.run(host="0.0.0.0", port=port, debug=debug_mode)
